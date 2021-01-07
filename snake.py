@@ -1,5 +1,6 @@
 import curses
 import random
+import signal
 import time
 
 logfile = open("haha.log", 'w')
@@ -14,9 +15,6 @@ def log(*args, **kwargs):
 
 
 scr = curses.initscr()
-curses.noecho()
-curses.curs_set(0)
-curses.cbreak()
 scr.keypad(True)
 
 refresh_second = 0.15  # 多长时间移动一次，单位为秒
@@ -147,12 +145,28 @@ def play_game():
 
 
 def main():
-    while 1:
-        scr.erase()
-        scr.timeout(50)
-        play_game()
-        scr.timeout(-1)
-        scr.getch()
+    curses.noecho()
+    curses.curs_set(0)
+
+    def rollback():
+        curses.curs_set(2)
+        curses.endwin()
+        curses.beep()
+
+    def on_interupted(signumber, frame):
+        rollback()
+        exit(0)
+
+    signal.signal(signal.SIGINT, on_interupted)
+    try:
+        while 1:
+            scr.erase()
+            scr.timeout(50)
+            play_game()
+            scr.timeout(-1)
+            scr.getch()
+    except:
+        rollback()
 
 
 if __name__ == '__main__':
