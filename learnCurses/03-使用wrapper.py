@@ -4,6 +4,8 @@ import curses
 """
 使用wrapper
 """
+
+
 def main(stdscr):
     # Clear screen
     stdscr.erase()
